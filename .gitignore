@@ -1,0 +1,82 @@
+# Nextflow
+work/
+.nextflow/
+.nextflow.log*
+.nextflow-history
+.nextflow_tmp/
+.*.swp
+
+# 分析结果 (保留 results/.gitkeep)
+results/*
+!results/.gitkeep
+
+# 测试运行结果 (-profile test 的输出)
+test/results/
+
+# 生成的测试数据与宿主索引
+# 由 test/data/make_test_data.py 生成, 脚本本身入库以保证可复现
+test/data/host_reference/
+
+# Conda 环境缓存 (conf/conda.config)
+.conda_cache/
+
+# Singularity/Apptainer 镜像缓存 (conf/singularity.config)
+.singularity_cache/
+
+# 本机便利配置 (个人数据库路径等, 见 conf/local.config 头注释)
+conf/local.config
+
+# 大型数据文件 (不提交到 Git)
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bam.bai
+*.sam
+*.cram
+*.vcf
+*.bed
+*.fa
+*.fna
+*.fasta
+*.faa
+*.gff
+*.gtf
+*.db
+*.bt2
+*.bt2l
+*.bt2l.1.bt2
+*.bt2l.2.bt2
+*.bt2.1.bt2
+*.bt2.2.bt2
+
+# 测试夹具例外 (Phase 19, 必须在上述通配规则之后): 小型合成 FASTQ 与
+# stub 门卫目录入库, 保证克隆后 -profile test 可直接运行; 宿主索引
+# (二进制, 需 bowtie2-build) 仍由 make_test_data.py 现场生成
+!test/data/*.fastq.gz
+!test/data/dummy_dbs/
+
+# 数据库 (不提交)
+assets/databases/
+
+# Python
+__pycache__/
+*.pyc
+
+# Conda
+*.yml.bak
+*.yaml.bak
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+!*.log.example
