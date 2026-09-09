@@ -1,0 +1,3 @@
+sample,fastq_1,fastq_2,group,batch,host
+S01,test/data/S01_R1.fastq.gz,test/data/S01_R2.fastq.gz,control,B01,human
+S02,test/data/S02_R1.fastq.gz,test/data/S02_R2.fastq.gz,treatment,B01,human
