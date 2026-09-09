@@ -1,0 +1,65 @@
+# ============================================================================
+# MultiQC 自定义内容配置 — nextflow-metagenomics Phase 15
+#
+# 将工作流产出的 MAG 级汇总 TSV 以表格式解析进 multiqc_report.html。
+# 文件名沿用 MultiQC 惯例 (multiqc_config.yaml), 由 MULTIQC process
+# 经 -c 显式传入, 不依赖配置自动发现。
+#
+# 搜索模式注册在全局 sp 段 (MultiQC 1.21 的 custom content 机制:
+# custom_data 条目以 c_id in report.files 激活, 见 1.21 源码
+# modules/custom_content/custom_content.py)。1.21 不读取
+# custom_data 条目内的 search_patterns 子键。
+#
+# 行键语义: 五张表第一列均为行标识 (meta_id / sample / MAG_ID),
+# MultiQC TSV 解析器以第一列作为 sample name —— 表以 MAG 为行呈现。
+# 缺失的表 (对应 Phase 被 skip 或数据库不可用) 不会出现在 qc_inputs/,
+# MultiQC 跳过对应 section, 不报错、不伪造。
+# ============================================================================
+
+sp:
+  mag_qc:
+    fn: "mag_qc.tsv"
+  mag_taxonomy:
+    fn: "mag_taxonomy.tsv"
+  mag_metadata:
+    fn: "mag_metadata.tsv"
+  mag_functional_annotation:
+    fn: "mag_functional_annotation.tsv"
+  mag_abundance:
+    fn: "mag_abundance.tsv"
+
+custom_data:
+  mag_qc:
+    section_name: "MAG QC (CheckM2)"
+    file_format: "tsv"
+    plot_type: "table"
+    pconfig:
+      id: "mag_qc_table"
+
+  mag_taxonomy:
+    section_name: "MAG taxonomy (GTDB-Tk)"
+    file_format: "tsv"
+    plot_type: "table"
+    pconfig:
+      id: "mag_taxonomy_table"
+
+  mag_metadata:
+    section_name: "MAG metadata"
+    file_format: "tsv"
+    plot_type: "table"
+    pconfig:
+      id: "mag_metadata_table"
+
+  mag_functional_annotation:
+    section_name: "MAG functional annotation"
+    file_format: "tsv"
+    plot_type: "table"
+    pconfig:
+      id: "mag_functional_annotation_table"
+
+  mag_abundance:
+    section_name: "MAG abundance (CoverM)"
+    file_format: "tsv"
+    plot_type: "table"
+    pconfig:
+      id: "mag_abundance_table"
