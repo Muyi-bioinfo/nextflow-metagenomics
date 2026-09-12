@@ -343,8 +343,10 @@ results/<batch_id>/
 ```
 
 核心交付 `mag_metadata.tsv`（QC/分类/基因组统计/丰度，行 = 代表 MAG）与
-`mag_functional_annotation.tsv`（KO/COG/GO/Pathway/ARG，行 = gene）。逐文件
-清单见 [docs/output.md](docs/output.md)。
+`mag_functional_annotation.tsv`（KO/COG/GO/Pathway/ARG，行 = gene）。Phase 21
+结果可视化在相关 Phase 目录下新增 `figures/` 子目录（7 张 PNG，有图才建），如
+`13_abundance/figures/mag_abundance_heatmap.png`、`99_multiqc/figures/
+workflow_summary.png` 等。逐文件清单见 [docs/output.md](docs/output.md)。
 
 ## 测试
 
@@ -416,6 +418,12 @@ Profile 可叠加：`-profile test,docker -stub-run` 实测通过（54/54，stub
   开发机数据库不可用，以上阶段仅 stub-run 验证（通道拓扑 + 参数守卫 +
   输出结构），未伪造任何数值。
 - **metaSPAdes 真实运行未验证**（MEGAHIT 已真实验证）。
+- **Phase 21 绘图 database-dependent**：7 张图除 MAG 丰度热图（CoverM 无库
+  依赖，已真实渲染）外，其余 6 张（QC 散点 / 门纲组成 / 跨样本 taxa / PCoA /
+  通路热图 / 漏斗的 QC·分类层级）依赖 Kraken2/CheckM2/GTDB-Tk/HUMAnN 真实
+  输出，开发机数据库不可用 —— 代码用 stub/合成表验证「能画」，真实图待库
+  （不伪造）。绘图 process 容器模式需 mulled 多工具镜像（python:3.12 不含
+  matplotlib/numpy）。
 - **容器路径未实机验证**：开发机（WSL2）无 docker/apptainer/singularity/
   sbatch。已验证镜像 tag 存在性与 profile 叠加语法（docker+stub 54/54）；
   镜像实际拉取与容器内运行待有引擎环境。coverm 官方镜像不含 python3

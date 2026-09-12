@@ -4,6 +4,12 @@
 编号目录。目录树与各 process 的 `publishDir` 一一对应 —— 被 `--skip_*` 跳过的
 阶段不产生对应目录，`--save_*` 关闭的中间产物不发布（默认可再生的不发布）。
 
+Phase 21 结果可视化在相关 Phase 目录下新增 `figures/` 子目录（仅在有图产出时
+创建）：7 张 PNG 落在 03_taxonomy / 04_function / 08_mag_qc / 10_mag_taxonomy /
+13_abundance / 99_multiqc 的 `figures/` 下，其余 Phase 目录不建 `figures/`。
+database-dependent 图（除 MAG 丰度热图外）真实数据待库，代码由 stub/合成表
+验证「能画」（见 STATUS.md 已知问题）。
+
 ```text
 results/<batch_id>/
 ├── 00_metadata/
@@ -60,6 +66,10 @@ results/<batch_id>/
 | `kraken2/classifications/<sample>.kraken2.output.txt.gz` | 逐 read 分类结果（`--save_kraken2_output`，默认 false，可达数 GB） |
 | `bracken/<sample>.bracken.<level>.tsv` | Bracken 丰度表（每层级一个，层级见 `--bracken_levels`） |
 | `bracken/<sample>.bracken.<level>.report.txt` | Bracken 重估后的 Kraken 风格报告 |
+| `combined/merged_<level>.tsv` | 跨样本 Bracken 丰度矩阵（行=分类单元名，列=样本，数值=`fraction_total_reads`，缺失样本补 0；每个层级一张，Phase 20） |
+| `combined/beta_diversity.tsv` | 样本×样本 Bray-Curtis 距离矩阵（基于所选层级相对丰度；仅 ≥2 样本且 ≥1 分类单元时产出，Phase 20） |
+| `figures/taxonomic_composition.png` | 跨样本 top taxa 组成（← `merged_<level>.tsv`，S 层级优先；Phase 21） |
+| `figures/beta_diversity_pcoa.png` | β 多样性 PCoA（← `beta_diversity.tsv`，numpy 特征分解；单样本/0 taxa 不产出；Phase 21） |
 
 ## 04_function/ — Read-based 功能谱（HUMAnN）
 
@@ -69,6 +79,8 @@ results/<batch_id>/
 | `humann/<sample>_pathabundance.tsv` | 通路丰度表 |
 | `humann/<sample>_pathcoverage.tsv` | 通路覆盖度表 |
 | `humann/<sample>.humann.log` | HUMAnN 运行日志 |
+| `combined/merged_pathabundance.tsv` | 跨样本通路丰度矩阵（行=pathway，列=样本，数值=HUMAnN Abundance，缺失补 0；Phase 20） |
+| `figures/pathway_abundance_heatmap.png` | top-N 通路丰度热图（N=`--plot_pathway_top`，默认 50，log10 色阶；Phase 21） |
 
 ## 05_assembly/ — 组装与质控
 
@@ -104,6 +116,7 @@ results/<batch_id>/
 |------|------|
 | `checkm2/<mag_id>.qc.tsv` | 逐 MAG CheckM2 结果 |
 | `mag_qc.tsv` | 全局 QC 汇总表（完整度/污染度，dRep 打分输入） |
+| `figures/completeness_vs_contamination.png` | 完整度 vs 污染度散点 + 阈值线（`mag_min_completeness`/`mag_max_contamination`；Phase 21） |
 
 ## 09_dereplication/ — MAG 去冗余（dRep）
 
@@ -121,6 +134,7 @@ results/<batch_id>/
 | `gtdbtk/` | 平铺的 summary TSV（bac120/ar53） |
 | `gtdbtk_out/` | GTDB-Tk 原始输出目录 |
 | `mag_taxonomy.tsv` | 分类汇总表（sample/mag_id/rep_mag_id/domain..species，成员 MAG 分类由代表回填） |
+| `figures/mag_taxonomy_composition.png` | 门/纲组成（top-N 门/纲 MAG 计数；Phase 21） |
 
 ## 11_gene_prediction/ — 基因预测（Prodigal）
 
@@ -146,6 +160,7 @@ results/<batch_id>/
 | 文件 | 说明 |
 |------|------|
 | `mag_abundance.tsv` | 跨样本丰度矩阵：行 = mag_id、列 = 样本 ID，相对丰度 0-1 |
+| `figures/mag_abundance_heatmap.png` | MAG 丰度热图（本机真实可验证；Phase 21） |
 
 ## 14_integrated/ — 整合结果（核心交付）
 
@@ -163,6 +178,7 @@ results/<batch_id>/
 | `multiqc_report.html` | 全 batch 汇总报告 |
 | `multiqc_report_data/` | 报告底层数据（各模块解析结果） |
 | `versions.yml` | 各工具版本 |
+| `figures/workflow_summary.png` | MAG 工作流漏斗（raw bins → passing QC → after dRep → GTDB-Tk assigned，缺失层级跳过；Phase 21） |
 
 覆盖模块：fastqc / fastp / bowtie2（宿主去除 + 比对）/ quast，以及自定义 MAG 级
 表 mag_qc.tsv / mag_taxonomy.tsv / mag_metadata.tsv / mag_functional_annotation.tsv /

@@ -47,6 +47,7 @@ SE 样本：reads = `[R1]`（单元素列表）。meta.single_end 控制各模�
 | annotation tables | `path(diamond_hits.tsv)` 等 | `ANNOTATION.out.diamond_table / eggnog_table / rgi_table` | INTEGRATION（键 = (meta_id, mag_id, gene)） |
 | abundance | `path(mag_abundance.tsv)` | `ABUNDANCE.out.abundance` | INTEGRATION + MULTIQC |
 | integrated | `path(...)` | `INTEGRATION.out.metadata / functional / ...` | MULTIQC（混入 ch_multiqc_files） |
+| read-based merged matrices | `path(merged_<level>.tsv)`（glob）/ `path(beta_diversity.tsv)`（optional）/ `path(merged_pathabundance.tsv)` | `READ_BASED_MERGE.out.bracken_merged / beta_diversity / pathabundance_merged` | 跨样本比较（Phase 21 PLOTTING：PCoA / 热图，只消费现成表） |
 | multiqc files | 各 Phase QC 产物的混入通道 | Phase 3/4/5/6/8/10/13/14 | MULTIQC（`.collect()` 后传入） |
 
 MAG 级通道的 `mag_id` 格式：`<unit>.<assembler>.<binner>.<bin_no>`（三位补零），
@@ -71,6 +72,8 @@ PREPROCESSING.out.reads:  tuple(meta, [R1, R2])   ← 单一来源, 三分支共
     ├──→ READ_BASED(ch_clean_reads)                   (Phase 4, 与 ASSEMBLY 并行)
     │       ├── KRAKEN2 → BRACKEN (× 层级 scatter)     → 03_taxonomy/
     │       └── HUMANN                                 → 04_function/
+    │       └──→ READ_BASED_MERGE(bracken_abundance, pathabundance)   (Phase 20)
+    │               → 03_taxonomy/combined/ + 04_function/combined/（跨样本矩阵）
     │
     └──→ ASSEMBLY(ch_clean_reads)                     (Phase 5, 与 READ_BASED 并行)
             ├── MEGAHIT / METASPADES (按 params.assembler)
@@ -91,6 +94,10 @@ DREP(qualified_mags, qc_table)           (Phase 9)     → representatives + mem
 INTEGRATION(representatives, membership, qc, taxonomy, abundance,
             diamond, eggnog, rgi, assembly_summary)    (Phase 14)
             → 14_integrated/ 两张核心表 + 引用拷贝
+            ↓
+PLOTTING(bin_summary, qc, taxonomy, membership, abundance,
+         bracken_merged, beta_diversity, pathabundance_merged)  (Phase 21)
+            → 各 Phase figures/ 7 张 PNG (只消费现成表)
             ↓
 MULTIQC(ch_multiqc_files.collect(), multiqc_config)    (Phase 15)
 ```
@@ -207,3 +214,68 @@ INTEGRATION 的每个输入表都可能因对应 `--skip_*` 为空通道，子�
 0 字节哨兵 ifEmpty 兜底，缺失表的对应列留空、行集合由存在表的并集决定。
 哨兵喂给多个输入时需 `stageAs: '<固定名>.tsv'` 规避 Nextflow 输入文件名冲突
 （同一哨兵按原名暂存多个输入会报 name collision）。
+
+## Read-based 跨样本合并（Phase 20）
+
+READ_BASED_MERGE 只消费 READ_BASED 的逐样本 emit，产出跨样本宽表矩阵。
+输入/输出契约：
+
+```
+take:
+  ch_bracken_abundance   tuple(meta, level, path)   READ_BASED.out.bracken_abundance
+  ch_pathabundance       tuple(meta, path)          READ_BASED.out.pathabundance
+
+emit:
+  bracken_merged        path(merged_<level>.tsv)    glob 匹配各层级矩阵（单次任务
+                                                   产出全部层级，emit 为文件列表，
+                                                   可用 flatten 展开）
+  beta_diversity        path(beta_diversity.tsv)    optional（单样本/0 taxa 不发射）
+  pathabundance_merged  path(merged_pathabundance.tsv)
+```
+
+矩阵 schema（详见 docs/output.md）：
+
+| 矩阵 | 行键 | 列 | 数值 | 缺失 |
+|------|------|----|------|------|
+| `merged_<level>.tsv` | Bracken `name`（分类单元名） | 样本 ID | `fraction_total_reads`（0-1 相对丰度，原样保留） | 补 `0` |
+| `beta_diversity.tsv` | 样本 ID（首格为空，标准距离矩阵格式） | 样本 ID | Bray-Curtis 距离（对称，对角 0） | — |
+| `merged_pathabundance.tsv` | HUMAnN pathway 字符串 | 样本 ID | HUMAnN Abundance（RPK，原样保留） | 补 `0` |
+
+聚合模式沿用 ArrayBag 规避（STATUS 已知问题）：manifest 经 collectFile
+物化（sort: true）、文件列表经 toSortedList 传 `path` 输入（声明为 path 输入
+保证 -resume 依赖追踪），脚本经 manifest 的 resolve() 双路径打开文件（Phase
+12/14 模式）。skip_kraken2 / skip_bracken / skip_humann 各自跳过时对应逐样本
+emit 为空通道 → collectFile 不发射 → 对应 merge process 不调度（告警已由
+read_based.nf 发出）。合并值取逐样本表的原始字符串（不做重归一化），合并
+数值正确性由 bin/merge_read_based.py 单测覆盖（合成表）。
+
+## 结果可视化（Phase 21）
+
+PLOTTING 只消费各 Phase 已产出的 TSV（含 Phase 20 combined 矩阵），产出 7 张
+PNG 到对应 Phase 的 `figures/` 子目录（有图才建）。输入/输出契约：
+
+```
+take:
+  ch_bin_summary          path(bin_summary.tsv)       BINNING.out.summary（漏斗 raw bins 锚）
+  ch_qc_table             path(mag_qc.tsv)            MAG_QC.out.qc_table（散点 + 漏斗）
+  ch_taxonomy_table       path(mag_taxonomy.tsv)      TAXONOMY.out.taxonomy_table（组成 + 漏斗）
+  ch_membership           path(mag_membership.tsv)    DREP.out.membership（漏斗 after dRep）
+  ch_abundance            path(mag_abundance.tsv)     ABUNDANCE.out.abundance（丰度热图）
+  ch_bracken_merged       path(merged_<level>.tsv)    READ_BASED_MERGE.out.bracken_merged（top taxa）
+  ch_beta_diversity       path(beta_diversity.tsv)    READ_BASED_MERGE.out.beta_diversity（PCoA, optional）
+  ch_pathabundance_merged path(merged_pathabundance.tsv) READ_BASED_MERGE.out.pathabundance_merged（pathway 热图）
+
+emit:
+  versions                path(versions.yml)           仅版本（figures 经 publishDir 发布, 不下游消费）
+```
+
+调度语义：每个 plot process 以其输入通道是否为空独立调度 —— 对应 Phase 被 skip
+时（通道空）该图不调度、`figures/` 不建。漏斗以 bin_summary 为锚（非空才调度），
+其余 3 张可选表（qc/membership/taxonomy）以 0 字节哨兵 `ifEmpty` 兜底（stageAs
+固定暂存名规避同名冲突，同 INTEGRATE_METADATA 模式），脚本按「0 字节 = 层级缺失」
+跳过该级画剩余漏斗。注意：**不要对 glob emit 的通道用 toSortedList()** —— 空通道
+上 toSortedList 会发射空列表（而非不发射），导致 process 以空输入误调度；直接传
+通道即可（空通道不调度，单/多文件由 process `path` 输入 + 脚本 `nargs='+'` 接住）。
+脚本按列名定位（缺列 SystemExit），空表/单点告警跳过不写 PNG（PNG 输出为
+optional），matplotlib Agg backend + 固定 figsize 8×6 / dpi 100（输出 800×600）。
+
