@@ -155,3 +155,10 @@ dependencies:
   # ---- 报告 ----
   - multiqc=1.21              # 降级原因见上: gtdbtk 的 pydantic <2
   - rich=13.9.4               # multiqc 1.21 需要 rich.panel (rich 15 已移除), 见上
+
+  # ---- Phase 21 结果可视化 ----
+  - matplotlib=3.10.9         # 画图脚本 bin/plot_results.py (Agg backend);
+                             # numpy 见下 (checkm2 的 tensorflow 已钉 numpy<2,
+                             # matplotlib 3.10.x 与 numpy 1.26 / py3.12 兼容)
+  - numpy=1.26                # 直接依赖 (PCoA 特征分解); checkm2 传递钉 1.26,
+                             # 此处显式声明画图脚本的直接依赖
