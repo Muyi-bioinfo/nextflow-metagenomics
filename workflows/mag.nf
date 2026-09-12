@@ -39,6 +39,7 @@
 
 include { PREPROCESSING } from '../subworkflows/local/preprocessing.nf'
 include { READ_BASED    } from '../subworkflows/local/read_based.nf'
+include { READ_BASED_MERGE } from '../subworkflows/local/read_based_merge.nf'
 include { ASSEMBLY      } from '../subworkflows/local/assembly.nf'
 include { MAPPING       } from '../subworkflows/local/mapping.nf'
 include { BINNING       } from '../subworkflows/local/binning.nf'
@@ -49,6 +50,7 @@ include { GENE_PREDICTION } from '../subworkflows/local/gene_prediction.nf'
 include { ANNOTATION      } from '../subworkflows/local/annotation.nf'
 include { ABUNDANCE       } from '../subworkflows/local/abundance.nf'
 include { INTEGRATION     } from '../subworkflows/local/integration.nf'
+include { PLOTTING        } from '../subworkflows/local/plotting.nf'
 include { MULTIQC       } from '../modules/local/qc/multiqc.nf'
 
 /*
@@ -154,9 +156,25 @@ workflow mag {
     // 该子工作流内部是两条并行分支; 各工具缺数据库时自行 warn 并跳过, 不会
     // 影响其他分支, 也不会伪造产物。
     // ---------------------------------------------------------------------
+    ch_bracken_merged       = Channel.empty()
+    ch_beta_diversity       = Channel.empty()
+    ch_pathabundance_merged = Channel.empty()
+
     if (!params.skip_read_based) {
         READ_BASED(ch_clean_reads)
         ch_multiqc_files = ch_multiqc_files.mix(READ_BASED.out.multiqc_files)
+
+        // Phase 20: read-based 跨样本整合 (只消费逐样本 emit, 产出样本×taxa /
+        // 样本×pathway 宽表矩阵 + β 多样性距离矩阵)。skip_kraken2 / skip_bracken /
+        // skip_humann 各自跳过时, 对应逐样本通道为空 → 对应 merge process 不
+        // 调度 (告警已由 read_based.nf 发出)。
+        READ_BASED_MERGE(
+            READ_BASED.out.bracken_abundance,
+            READ_BASED.out.pathabundance
+        )
+        ch_bracken_merged       = READ_BASED_MERGE.out.bracken_merged
+        ch_beta_diversity       = READ_BASED_MERGE.out.beta_diversity
+        ch_pathabundance_merged = READ_BASED_MERGE.out.pathabundance_merged
     }
     else {
         log.warn "整个 read-based 分支已跳过 (--skip_read_based), 不产出物种分类与功能谱结果。"
@@ -217,13 +235,15 @@ workflow mag {
     // --skip_assembly 或 --skip_mapping 时两个上游通道至少有一个为空, 这里不会
     // 有任何任务被调度 (上面已就此告警, 不重复)。
     // ---------------------------------------------------------------------
-    ch_mags = Channel.empty()
+    ch_mags        = Channel.empty()
+    ch_bin_summary = Channel.empty()
 
     if (!params.skip_binning) {
         BINNING(ch_contigs, ch_depth)
 
         // Phase 8 (CheckM2 质控) 从此通道接入 —— 每个 MAG 一条记录
         ch_mags          = BINNING.out.mags
+        ch_bin_summary   = BINNING.out.summary   // Phase 21 漏斗 raw bins
         ch_multiqc_files = ch_multiqc_files.mix(BINNING.out.multiqc_files)
 
         // Phase 8: CheckM2 MAG QC; qualified_mags retains BINNING.out.mags shape.
@@ -355,6 +375,19 @@ workflow mag {
     else {
         log.warn "结果整合已跳过 (--skip_integration), 不产出 14_integrated 汇总表。"
     }
+
+    // ---------------------------------------------------------------------
+    // Phase 21: 结果可视化 (画图消费层 —— 只读各 Phase 已产出 TSV, 不重做计算)
+    //
+    // 每个 plot process 以其输入通道是否为空独立调度: 对应 Phase 被 skip 时
+    // 该图不调度、figures/ 不建。database-dependent 图 (除 MAG 丰度热图外)
+    // 真实数据本机无库, 代码由 stub/合成表验证"能画", 真实图待库 (规则 3)。
+    // ---------------------------------------------------------------------
+    PLOTTING(
+        ch_bin_summary, ch_qc_table, ch_taxonomy_table, ch_membership,
+        ch_abundance, ch_bracken_merged, ch_beta_diversity,
+        ch_pathabundance_merged
+    )
 
     // ---------------------------------------------------------------------
     // 汇总 QC 报告 (Phase 15)
