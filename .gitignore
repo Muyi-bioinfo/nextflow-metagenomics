@@ -27,7 +27,6 @@ test/data/host_reference/
 conf/local.config
 
 # 内部开发笔记 (本地保留, 不上传仓库)
-CLAUDE.md
 STATUS.md
 PLAN.md
 

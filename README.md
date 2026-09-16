@@ -1,5 +1,7 @@
 # nextflow-metagenomics
 
+**English** | [中文](README_CN.md)
+
 A production-grade shotgun metagenomics workflow built on Nextflow DSL2:
 taxonomic classification, functional profiling, cross-sample integration, MAG
 reconstruction, and result visualization.

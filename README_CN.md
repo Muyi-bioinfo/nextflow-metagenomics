@@ -1,5 +1,7 @@
 # nextflow-metagenomics
 
+[English](README.md) | **中文**
+
 基于 Nextflow DSL2 的生产级鸟枪法宏基因组学工作流：物种分类、功能谱分析、
 跨样本整合、MAG 重建与结果可视化。
 
