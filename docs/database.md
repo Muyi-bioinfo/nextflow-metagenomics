@@ -2,7 +2,7 @@
 
 本文档描述 nextflow-metagenomics 使用的所有数据库与参考文件：是什么、大致体量、
 经哪个参数传入、被哪个 Phase 使用、**缺失时的行为**（报错 / 跳过 / 留空）。
-所有路径均通过 `params.*` 传入，仓库中不出现任何硬编码路径（规则 1）。
+所有路径均通过 `params.*` 传入，仓库中不出现任何硬编码路径。
 
 ---
 
@@ -11,9 +11,9 @@
 | 数据库 | 用途 | Phase | 参数 | 大致体量 | 缺失时行为 |
 |--------|------|-------|------|----------|-----------|
 | 宿主基因组索引 | 宿主去除 (Bowtie2) | 3 | `--host_index` | 视宿主基因组而定（人类约 3-4 GB） | **跳过宿主去除**：clean reads 直通下游（可显式 `--skip_host_removal`） |
-| Kraken2 标准库 | read 级物种分类 | 4 | `--kraken2_db` | 标准库磁盘数十 GB 起；`--kraken2_memory_mapping false`（默认）时整库入内存，约 40-70 GB RAM | **告警并跳过 Kraken2/Bracken 分支**（不报错，不伪造） |
+| Kraken2 标准库 | read 级物种分类 | 4 | `--kraken2_db` | 标准库磁盘数十 GB 起；`--kraken2_memory_mapping false`（默认）时整库入内存，约 40-70 GB RAM | **告警并跳过 Kraken2/Bracken 分支**（不报错，不虚构） |
 | Bracken kmer_distrib | read 丰度估计 | 4 | `--bracken_db` | 内嵌于 Kraken2 库内（无独立体量） | 默认 `bracken_db ?: kraken2_db` 自动跟随 Kraken2 库；两者皆缺时随 Kraken2 分支告警跳过 |
-| HUMAnN 三库 | 功能谱分析 | 4 | `--humann_db` / `--humann_nucleotide_db` / `--humann_protein_db` / `--metaphlan_db` | ChocoPhlAn ~5 GB、UniRef ~6-14 GB（uniref50/uniref90）、MetaPhlAn ~1-2 GB | **告警并跳过 HUMAnN 分支**（不报错，不伪造） |
+| HUMAnN 三库 | 功能谱分析 | 4 | `--humann_db` / `--humann_nucleotide_db` / `--humann_protein_db` / `--metaphlan_db` | ChocoPhlAn ~5 GB、UniRef ~6-14 GB（uniref50/uniref90）、MetaPhlAn ~1-2 GB | **告警并跳过 HUMAnN 分支**（不报错，不虚构） |
 | CheckM2 DIAMOND DB | MAG 完整度/污染度 | 8 | `--checkm2_db` | 约 3 GB | **明确报错**（不静默跳过）；或 `--skip_mag_qc` |
 | GTDB-Tk 参考库 | MAG 物种分类 | 10 | `--gtdbtk_db` | R220+ 解压后约 110 GB | **明确报错**；或 `--skip_taxonomy` |
 | dRep (MASH/FastANI) | MAG 去冗余 | 9 | 无（无 `drep_db` 参数） | 随 dRep 环境自带 | 无外部依赖；质量打分复用 Phase 8 的 QC 表（`--skip_mag_qc` 必须连带 `--skip_dereplication`，由 DREP 子工作流守卫报错） |
@@ -22,7 +22,7 @@
 | CARD card.json | 抗性基因注释 | 12 | `--card_db` | GB 级 | **明确报错**；或 `--skip_rgi` / `--skip_annotation` |
 | Prodigal | 基因预测 | 11 | 无 | 独立二进制 | 无外部依赖 |
 | CoverM | MAG 丰度 | 13 | 无 | 自带比对器 | 无外部依赖（复用 Phase 6 排序 BAM） |
-| KO→pathway 映射 | 功能表 Pathway 列 | 14 | `--pathway_db` | 文本级（MB 级） | **可选**：未提供 → Pathway 列留空（不伪造）；提供了路径但文件不存在 → checkIfExists 明确报错 |
+| KO→pathway 映射 | 功能表 Pathway 列 | 14 | `--pathway_db` | 文本级（MB 级） | **可选**：未提供 → Pathway 列留空（不虚构）；提供了路径但文件不存在 → checkIfExists 明确报错 |
 
 ### 缺失行为小结
 
@@ -76,11 +76,11 @@
 6. **配置求值顺序实测**（Nextflow 26.04）：配置解析器禁止 if/try 语句，
    上述逻辑以 ConfigSlurper + 顶层赋值表达式实现；CLI 参数在配置求值时已
    可见，故优先级语义成立。四场景实测（派生全链路 / 缺子目录报错 / 显式
-   覆盖 / local.config 自动读入）见 STATUS.md Phase 17 测试状态。
+   覆盖 / local.config 自动读入）均已通过。
 
-### 本机约定目录（示例，非仓库内容）
+### 本地约定目录（示例，非仓库内容）
 
-开发机以 `/home/yangcl/Database/MAG-db/` 为 `db_dir` 根（与 mNGS-db /
+本地以 `/data/databases/MAG-db/` 为 `db_dir` 根（与 mNGS-db /
 tNGS-db 同根约定），经 gitignored 的 `conf/local.config` 提供 —— 仓库中
 不出现个人路径，CI/他人环境无此文件时 `db_dir` 维持 null，行为不变。
 

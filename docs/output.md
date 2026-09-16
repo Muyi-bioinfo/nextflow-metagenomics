@@ -8,7 +8,7 @@ Phase 21 结果可视化在相关 Phase 目录下新增 `figures/` 子目录（�
 创建）：7 张 PNG 落在 03_taxonomy / 04_function / 08_mag_qc / 10_mag_taxonomy /
 13_abundance / 99_multiqc 的 `figures/` 下，其余 Phase 目录不建 `figures/`。
 database-dependent 图（除 MAG 丰度热图外）真实数据待库，代码由 stub/合成表
-验证「能画」（见 STATUS.md 已知问题）。
+验证「能画」（详见文档）。
 
 ```text
 results/<batch_id>/
@@ -160,7 +160,7 @@ results/<batch_id>/
 | 文件 | 说明 |
 |------|------|
 | `mag_abundance.tsv` | 跨样本丰度矩阵：行 = mag_id、列 = 样本 ID，相对丰度 0-1 |
-| `figures/mag_abundance_heatmap.png` | MAG 丰度热图（本机真实可验证；Phase 21） |
+| `figures/mag_abundance_heatmap.png` | MAG 丰度热图（可用真实数据验证；Phase 21） |
 
 ## 14_integrated/ — 整合结果（核心交付）
 
@@ -185,7 +185,7 @@ results/<batch_id>/
 mag_abundance.tsv（MultiQC custom content 表格式解析，配置见
 `modules/local/qc/multiqc_config.yaml`）。
 
-对应 Phase 被 skip 或数据库不可用时，缺失的模块/表不出现于报告（不伪造）。
+对应 Phase 被 skip 或数据库不可用时，缺失的模块/表不出现于报告（不虚构）。
 跳过 `--skip_multiqc` 则不生成整个 99_multiqc/。
 
 ## run_reports/ — Nextflow 运行报告（可选）

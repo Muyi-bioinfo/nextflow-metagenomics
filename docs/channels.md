@@ -1,7 +1,7 @@
 # 通道设计
 
 所有通道使用 `tuple(meta, ...)` 结构，meta 是 Groovy map，贯穿整个工作流
-（规则 2：不丢弃字段）。
+。
 
 ## Meta 对象
 
@@ -241,7 +241,7 @@ emit:
 | `beta_diversity.tsv` | 样本 ID（首格为空，标准距离矩阵格式） | 样本 ID | Bray-Curtis 距离（对称，对角 0） | — |
 | `merged_pathabundance.tsv` | HUMAnN pathway 字符串 | 样本 ID | HUMAnN Abundance（RPK，原样保留） | 补 `0` |
 
-聚合模式沿用 ArrayBag 规避（STATUS 已知问题）：manifest 经 collectFile
+聚合模式沿用 ArrayBag 规避：manifest 经 collectFile
 物化（sort: true）、文件列表经 toSortedList 传 `path` 输入（声明为 path 输入
 保证 -resume 依赖追踪），脚本经 manifest 的 resolve() 双路径打开文件（Phase
 12/14 模式）。skip_kraken2 / skip_bracken / skip_humann 各自跳过时对应逐样本

@@ -26,7 +26,7 @@ nextflow-metagenomics/
 ├── workflows/mag.nf           # 主 workflow
 ├── nextflow.config            # 参数定义 + profiles + db_dir 派生
 ├── conf/                      # base + conda/docker/singularity/slurm/test
-│   └── local.config           # (gitignored) 本机 db_dir 约定
+│   └── local.config           # (gitignored) 本地 db_dir 约定
 ├── modules/local/             # 本地模块（按 Phase 分目录）
 ├── subworkflows/local/        # 本地子工作流（每 Phase 一个）
 ├── bin/                       # Python 解析/编排脚本
@@ -77,7 +77,7 @@ flowchart LR
 
 ## 设计决策
 
-### 1. Channel / Metadata（规则 2）
+### 1. Channel / Metadata
 
 所有通道 `tuple(meta, ...)`，meta 贯穿全流程并随阶段追加字段
 （组装后追加 assembler/assembly_mode/samples）。完整契约见
@@ -91,18 +91,18 @@ flowchart LR
   深度矩阵是 MetaBAT2 的输入 —— 严格串联。
 - **MAG 链**：QC → 去冗余 → 分类串联（dRep 打分依赖 QC 质量输入，分类只跑
   代表集），基因预测 / 注释 / 丰度并行消费 Phase 9 代表集。
-- **工具定位**（易错点，CLAUDE.md 同表）：MEGAHIT/metaSPAdes 是可选替代
+- **工具定位**（易错点）：MEGAHIT/metaSPAdes 是可选替代
   组装器（非两级）；Kraken2 与 HUMAnN 是并行分支（HUMAnN 不依赖 Kraken2）；
   QUAST 是组装 QC（非 MAG QC，后者是 CheckM2）；dRep 是基因组级去冗余
   （非 CD-HIT 基因聚类）；CoverM 是 MAG 丰度（非转录本丰度）。
 
-### 3. 参数体系（规则 1）
+### 3. 参数体系
 
 - 全部参数定义于 `nextflow.config` 的 `params` 块，数据库/索引路径一律经
   `params.*` 传入，仓库零硬编码路径。
 - 配置加载顺序：`nextflow.config → conf/base.config → conf/<profile>.config`
   （后加载覆盖先加载）。
-- **publishDir 用闭包**（规则 4）：`{ "${params.outdir}/${params.batch_id}/..." }`
+- **publishDir 用闭包**：`{ "${params.outdir}/${params.batch_id}/..." }`
   延迟到 task 提交时求值，profile/CLI 对 outdir 的覆盖才能生效。
 - **db_dir 约定树派生**（Phase 17）：见 [database.md](database.md)「标准目录
   布局」。
@@ -129,12 +129,12 @@ flowchart LR
 `conf/base.config` 定义四档 label（process_single/low/medium/high），
 36 个 process 映射其中；大内存/长时任务按需 `withName` 固定覆盖
 （KRAKEN2/GTDBTK 64 GB 固定请求，OOM 由库规模决定而非重试升级）。
-`resourceLimits`（max_cpus/max_memory/max_time）封顶，本机与集群均安全。
+`resourceLimits`（max_cpus/max_memory/max_time）封顶，本地与集群均安全。
 
 ### 7. 失败语义
 
 - 数据库缺失：read-based 分支告警跳过；MAG 级阶段（CheckM2/GTDB-Tk/
-  注释三支）明确报错，不静默降级、不伪造产物（规则 3）。
+  注释三支）明确报错，不静默降级、不虚构产物。
 - 0 bin / 空通道是合法状态（S01 实测），下游以空通道正常收尾。
 - `--skip_mag_qc` 必须连带 `--skip_dereplication`，由子工作流守卫报错。
 
@@ -149,6 +149,4 @@ flowchart LR
 
 ## 参考
 
-- `CLAUDE.md` — 永久开发规则
-- `PLAN.md` / `STATUS.md` — 开发计划与当前状态
 - [workflow.md](workflow.md) / [channels.md](channels.md) — 流程与通道契约
