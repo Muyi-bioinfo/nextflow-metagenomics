@@ -5,8 +5,8 @@
 ```
 main.nf (薄入口)
   └─→ workflows/mag.nf (主 workflow: 全部 Phase 在此接入)
-        ├─→ subworkflows/local/*.nf   (12 个子工作流, 每个对应一个 Phase)
-        └─→ modules/local/*/          (30+ 个本地模块, 单一职责)
+        ├─→ subworkflows/local/*.nf   (14 个子工作流, 每个对应一个 Phase)
+        └─→ modules/local/*/          (45 个本地模块 / 47 个 process, 单一职责)
 ```
 
 - **main.nf**：只负责 include 主 workflow 并调用（`workflow mag`）。
@@ -17,8 +17,10 @@ main.nf (薄入口)
 - **modules/local/**：单一职责 process（FASTQC / FASTP 而非
   RUN_ALL_ANALYSIS），每个自带 conda/container 指令、publishDir、stub 块与
   versions.yml。
-- **bin/**：13 个 Python 解析/编排脚本（汇总表解析、BAM 交集过滤、样本表
-  验证等），作为显式输入暂存进 process（不依赖 PATH），均带单测覆盖。
+- **bin/**：14 个 Python 解析/编排脚本（汇总表解析、BAM 交集过滤、样本表
+  验证等）作为显式输入暂存进 process（不依赖 PATH），均带单测覆盖；另有 1 个
+  绘图工具脚本（`draw_workflow.py`，生成 docs/images/ 下的流程图 PNG，不参与
+  工作流执行）。
 
 ```text
 nextflow-metagenomics/
