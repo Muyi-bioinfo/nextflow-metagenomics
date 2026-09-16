@@ -37,43 +37,7 @@ MultiQC summary report is generated, and result visualizations are rendered.
 
 ## Workflow
 
-```mermaid
-flowchart TD
-    SS["samplesheet.csv (--input)"] --> CHECK["CHECK_SAMPLESHEET"]
-    CHECK --> RAW["tuple(meta, reads)"]
-    RAW --> PRE["PREPROCESSING<br/>FASTQC → FASTP → HOST_REMOVAL"]
-    PRE --> CLEAN["clean reads"]
-
-    CLEAN --> RB["READ_BASED ∥<br/>KRAKEN2 → BRACKEN ∥ HUMANN"]
-    CLEAN --> ASM["ASSEMBLY ∥<br/>MEGAHIT ∥ metaSPAdes → QUAST"]
-    RB --> RBM["READ_BASED_MERGE<br/>sample×taxa / sample×pathway matrices"]
-    ASM --> MAP["MAPPING<br/>BOWTIE2 → SAMTOOLS → DEPTH"]
-    ASM --> BIN["BINNING<br/>MetaBAT2 → SPLIT_BINS"]
-    MAP --> BIN
-
-    BIN --> MAGQC["MAG_QC<br/>CHECKM2"]
-    MAGQC --> DREP["DREP<br/>dRep dereplication"]
-    DREP --> REP["representative MAGs + membership table"]
-    REP --> TAX["TAXONOMY<br/>GTDB-Tk (member backfill)"]
-    REP --> GENE["GENE_PREDICTION<br/>PRODIGAL"]
-    GENE --> ANN["ANNOTATION ∥<br/>DIAMOND ∥ eggNOG ∥ RGI"]
-    REP --> AB["ABUNDANCE<br/>COVERM"]
-    MAP --> AB
-
-    INT["INTEGRATION<br/>two core tables + reference copy"]
-    MAGQC --> INT
-    TAX --> INT
-    ANN --> INT
-    AB --> INT
-    ASM --> INT
-    INT --> MQ["MULTIQC<br/>summary report"]
-
-    RBM --> PLOT["PLOTTING<br/>7 PNG figures"]
-    INT --> PLOT
-    MAGQC --> PLOT
-    TAX --> PLOT
-    BIN --> PLOT
-```
+![workflow overview](docs/images/workflow_compact.png)
 
 read-based (Phase 4) and the assembly/MAG chain (Phase 5+) fork in parallel from
 clean reads. Phase 20 (READ_BASED_MERGE) merges per-sample read-based results

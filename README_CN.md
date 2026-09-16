@@ -28,43 +28,7 @@ reads 的分析（物种分类、丰度估计、功能谱分析）和组装路�
 
 ## Workflow
 
-```mermaid
-flowchart TD
-    SS["samplesheet.csv (--input)"] --> CHECK["CHECK_SAMPLESHEET"]
-    CHECK --> RAW["tuple(meta, reads)"]
-    RAW --> PRE["PREPROCESSING<br/>FASTQC → FASTP → HOST_REMOVAL"]
-    PRE --> CLEAN["clean reads"]
-
-    CLEAN --> RB["READ_BASED ∥<br/>KRAKEN2 → BRACKEN ∥ HUMANN"]
-    CLEAN --> ASM["ASSEMBLY ∥<br/>MEGAHIT ∥ metaSPAdes → QUAST"]
-    RB --> RBM["READ_BASED_MERGE<br/>样本×taxa / 样本×pathway 矩阵"]
-    ASM --> MAP["MAPPING<br/>BOWTIE2 → SAMTOOLS → DEPTH"]
-    ASM --> BIN["BINNING<br/>MetaBAT2 → SPLIT_BINS"]
-    MAP --> BIN
-
-    BIN --> MAGQC["MAG_QC<br/>CHECKM2"]
-    MAGQC --> DREP["DREP<br/>dRep 去冗余"]
-    DREP --> REP["代表 MAG + 成员表"]
-    REP --> TAX["TAXONOMY<br/>GTDB-Tk (成员回填)"]
-    REP --> GENE["GENE_PREDICTION<br/>PRODIGAL"]
-    GENE --> ANN["ANNOTATION ∥<br/>DIAMOND ∥ eggNOG ∥ RGI"]
-    REP --> AB["ABUNDANCE<br/>COVERM"]
-    MAP --> AB
-
-    INT["INTEGRATION<br/>两张核心表 + 引用拷贝"]
-    MAGQC --> INT
-    TAX --> INT
-    ANN --> INT
-    AB --> INT
-    ASM --> INT
-    INT --> MQ["MULTIQC<br/>汇总报告"]
-
-    RBM --> PLOT["PLOTTING<br/>7 张 PNG 图"]
-    INT --> PLOT
-    MAGQC --> PLOT
-    TAX --> PLOT
-    BIN --> PLOT
-```
+![workflow overview](docs/images/workflow_compact.png)
 
 read-based（Phase 4）与组装/MAG 链（Phase 5+）从 clean reads 分叉并行；
 Phase 20（READ_BASED_MERGE）把逐样本 read-based 结果合并为跨样本矩阵；
