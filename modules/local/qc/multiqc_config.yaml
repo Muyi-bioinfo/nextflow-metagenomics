@@ -13,7 +13,7 @@
 # 行键语义: 五张表第一列均为行标识 (meta_id / sample / MAG_ID),
 # MultiQC TSV 解析器以第一列作为 sample name —— 表以 MAG 为行呈现。
 # 缺失的表 (对应 Phase 被 skip 或数据库不可用) 不会出现在 qc_inputs/,
-# MultiQC 跳过对应 section, 不报错、不伪造。
+# MultiQC 跳过对应 section, 不报错、不虚构。
 # ============================================================================
 
 sp:

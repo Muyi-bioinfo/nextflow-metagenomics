@@ -11,7 +11,7 @@
 // 可选表 (qc/membership/taxonomy) 由 PLOTTING 子工作流以 assets/empty.tsv
 // 哨兵兜底, stageAs 固定暂存名规避同名冲突 (同 INTEGRATE_METADATA 模式);
 // bin_summary 为锚 (非空才调度本 process —— 无 MAG 流水线则无漏斗)。
-// database-dependent: 真实 CheckM2/GTDB-Tk 数据本机无库。
+// database-dependent: 真实 CheckM2/GTDB-Tk 数据本地无库。
 // ============================================================================
 
 process PLOT_WORKFLOW_SUMMARY {

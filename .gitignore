@@ -26,6 +26,11 @@ test/data/host_reference/
 # 本机便利配置 (个人数据库路径等, 见 conf/local.config 头注释)
 conf/local.config
 
+# 内部开发笔记 (本地保留, 不上传仓库)
+CLAUDE.md
+STATUS.md
+PLAN.md
+
 # 大型数据文件 (不提交到 Git)
 *.fastq
 *.fastq.gz

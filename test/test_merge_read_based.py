@@ -3,9 +3,9 @@
 """test_merge_read_based.py — bin/merge_read_based.py 单测 (Phase 20)
 
 纯标准库 unittest, 直接运行:  python3 test/test_merge_read_based.py
-覆盖场景 (对应 STATUS 测试矩阵): 空表 / 缺列 / 缺样本补 0 / 层级选择 /
+覆盖场景 空表 / 缺列 / 缺样本补 0 / 层级选择 /
 单样本距离矩阵跳过 / 数值与逐样本一致。合成表仅用于验证合并逻辑 —— 真实
-Bracken/HUMAnN 数据本机无库, 不伪造 (规则 3)。
+Bracken/HUMAnN 数据本地无库, 不虚构 。
 """
 import os
 import sys

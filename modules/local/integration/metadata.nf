@@ -5,7 +5,7 @@
 // join 为 mag_metadata.tsv (行 = 代表 MAG, 与 dRep 代表集一致)。可选表
 // (QC/分类/丰度) 的缺失由 INTEGRATION 子工作流以 0 字节哨兵文件
 // (assets/empty.tsv) 兜底 —— ifEmpty 只接受具体值 (通道对象会泄漏为
-// DataflowStream, 见 STATUS 已知问题), 脚本按"0 字节 = 表缺失"处理,
+// DataflowStream, 详见文档), 脚本按"0 字节 = 表缺失"处理,
 // 对应列留空, 与 taxonomy_summary.py 的 --bac/--ar 缺失语义一致。
 // Genome_size / GC 由脚本用 Python 标准库现场计算 (不引入新工具)。
 //

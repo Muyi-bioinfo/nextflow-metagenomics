@@ -5,7 +5,7 @@
 //        汇总)。全部为"只消费"语义 —— 本阶段不重做任何上游计算。
 // 处理:  集合级批处理 ——
 //        1. 代表 MAG 清单物化为 manifest (collectFile, sort: true), FASTA
-//           经 toSortedList 传 path 输入 (ArrayBag 规避, 见 STATUS 已知问题);
+//           经 toSortedList 传 path 输入 (ArrayBag 规避, 详见文档);
 //        2. 可选表通道以 0 字节哨兵 (assets/empty.tsv) 兜底 —— ifEmpty 只
 //           接受具体值, 传通道对象会泄漏 DataflowStream (已知问题), 因此
 //           由本子工作流显式提供哨兵文件, 脚本按"0 字节 = 表缺失"处理;
@@ -52,7 +52,7 @@ workflow INTEGRATION {
     ch_rgi_in     = ch_rgi_table.ifEmpty(ch_sentinel)
 
     // pathway 映射表: 可选外部依赖 (--pathway_db), 未提供时用哨兵兜底
-    // (Pathway 列留空, 不伪造 —— 见 docs/database.md)
+    // (Pathway 列留空, 不虚构 —— 见 docs/database.md)
     ch_pathway = params.pathway_db
         ? Channel.value(file(params.pathway_db, checkIfExists: true))
         : Channel.value(ch_sentinel)

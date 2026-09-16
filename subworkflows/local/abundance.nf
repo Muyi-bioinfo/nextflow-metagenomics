@@ -20,7 +20,7 @@
 // <sample>.<assembler> —— 两套 contigs 的丰度不可合并为一列, 且 MAG 的
 // mag_id 本身带 assembler 字段, 消歧列名与其一一对应。
 //
-// ─── 聚合规则 (ArrayBag 规避, 见 STATUS.md「已知问题」) ───────────────────
+// ─── 聚合规则 (ArrayBag 规避, 详见文档) ───────────────────
 //   - BAM 清单: map{...}.collectFile(name:..., sort: true) 物化为文件;
 //   - BAM/BAI 与 MAG FASTA: map{...}.toSortedList() 传 path 输入
 //     (返回普通 List 而非 ArrayBag, 排序保证 -resume 哈希稳定)。

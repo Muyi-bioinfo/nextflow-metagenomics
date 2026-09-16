@@ -6,7 +6,7 @@
 // params.mag_min_completeness / params.mag_max_contamination。
 //
 // 只消费现成表。空表告警跳过; 单点正常绘制 (不崩)。database-dependent:
-// 真实 CheckM2 数据本机无库, 代码由 stub/合成表验证"能画"。
+// 真实 CheckM2 数据本地无库, 代码由 stub/合成表验证"能画"。
 // ============================================================================
 
 process PLOT_QC_SCATTER {

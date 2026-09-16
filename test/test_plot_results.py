@@ -5,9 +5,9 @@
 纯标准库 unittest (需 matplotlib + numpy), 直接运行:
     python3 test/test_plot_results.py
 
-覆盖场景 (对应 STATUS 测试矩阵): PNG 非空 + 尺寸 (IHDR 800×600) / 缺列报错 /
+覆盖场景 PNG 非空 + 尺寸 (IHDR 800×600) / 缺列报错 /
 空表单点不崩 / PCoA 缺失跳过 / 漏斗缺失层级 / function top-N。合成表仅用于
-验证"代码能画" —— 真实 database-dependent 数据本机无库, 不伪造 (规则 3)。
+验证"代码能画" —— 真实 database-dependent 数据本地无库, 不虚构 。
 """
 import os
 import struct

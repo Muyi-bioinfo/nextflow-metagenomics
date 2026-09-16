@@ -4,7 +4,7 @@
 // 集合级单次调用: 三张 (meta_id, mag_id, gene) 键控注释表按外连接合并为
 // 一张 mag_functional_annotation.tsv (行 = 三表键并集, 跨表同键合并为一行,
 // 缺失表/缺失字段留空)。可选表的缺失以 0 字节哨兵文件兜底 (与
-// INTEGRATE_METADATA 同机制); pathway_db 缺失时 Pathway 列留空 (不伪造)。
+// INTEGRATE_METADATA 同机制); pathway_db 缺失时 Pathway 列留空 (不虚构)。
 // manifest 用作 MAG 身份校验 (未知 mag_id 报错) 与三表全缺时的调度触发
 // (输出仅表头, 与 Phase 12 的空输入语义一致)。
 //

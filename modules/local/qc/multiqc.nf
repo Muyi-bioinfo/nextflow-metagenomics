@@ -51,7 +51,7 @@ process MULTIQC {
     # 2) QUAST 未做基因预测时 report.tsv 的 "# predicted genes (>= N bp)"
     #    行为 "-" —— MultiQC 的 quast 模块 (1.21 与 1.35 源码同段) 对这些
     #    值做字符串减法, 直接 TypeError 崩掉整个 quast 模块。删除"全部为 -"
-    #    的占位行: 有真实数值 (做过基因预测) 的行保留, 不伪造数据; 只改
+    #    的占位行: 有真实数值 (做过基因预测) 的行保留, 不虚构数据; 只改
     #    qc_inputs/ 暂存副本, 发布目录 (05_assembly/quast/) 的原始文件不受影响。
     find qc_inputs -name "report.tsv" -print0 | while IFS= read -r -d '' f; do
         awk -F'\\t' 'BEGIN{OFS=FS} {keep=1; if (\$1 ~ /^# predicted genes/) {keep=0; for(i=2;i<=NF;i++) if(\$i != "-") {keep=1; break}} if(keep) print}' "\$f" > "\$f.tmp" && mv "\$f.tmp" "\$f"

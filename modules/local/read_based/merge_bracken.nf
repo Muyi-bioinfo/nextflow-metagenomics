@@ -61,7 +61,7 @@ process MERGE_BRACKEN {
     # stub 也走真实解析脚本 (Phase 12/14 模式): 上游 BRACKEN stub 的逐样本表为
     # 0 字节文件 (按"空表"处理), 借此真实验证 manifest 装配、resolve() 双路径
     # 与输出 schema (仅表头宽表 + beta diversity 跳过)。合并数值正确性由
-    # bin/merge_read_based.py 单测覆盖 (合成表), stub 不伪造真实数据。
+    # bin/merge_read_based.py 单测覆盖 (合成表), stub 不虚构真实数据。
     python3 ${script} bracken \\
         --manifest ${manifest} \\
         --output-dir .

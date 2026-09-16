@@ -14,7 +14,7 @@
               Description/.../KO/GO/KEGG_Pathway)。
   --rgi       可选: rgi_annotations.tsv (meta_id/mag_id/gene/ARO/...)。
   --pathway   可选: KO→pathway 两列映射 (无表头), 即 params.pathway_db;
-              缺失或 0 字节时 Pathway 列留空 (不伪造)。KO 列容忍 "ko:" 前缀
+              缺失或 0 字节时 Pathway 列留空 (不虚构)。KO 列容忍 "ko:" 前缀
               (加载时剥离), pathway 原样保留; 同一 KO 可多行映射多个 pathway。
 
 三张表按 (meta_id, mag_id, gene) 外连接: 行 = 三表键的并集, 缺失表/缺失

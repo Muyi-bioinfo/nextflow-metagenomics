@@ -100,7 +100,7 @@ process RGI_MAIN {
     """
     # 占位输出仅验证通道形状与文件命名约定, 内容不代表真实注释结果。
     # 空 JSON (0 字节): PRODIGAL stub 的 faa 为空, RGI_SUMMARY 走真实解析
-    # 脚本, raw 与 faa 的空/非空须一致, 故不伪造命中条目。
+    # 脚本, raw 与 faa 的空/非空须一致, 故不虚构命中条目。
     touch ${mag_id}.rgi.json
 
     cat <<-END_VERSIONS > versions.yml

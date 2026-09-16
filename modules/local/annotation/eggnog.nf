@@ -53,7 +53,7 @@ process EGGNOG_MAPPER {
     """
     # 占位输出仅验证通道形状与文件命名约定, 内容不代表真实注释结果。
     # 空 annotations: PRODIGAL stub 的 faa 为空, EGGNOG_SUMMARY 走真实解析
-    # 脚本, raw 与 faa 的空/非空须一致, 故不伪造注释行。
+    # 脚本, raw 与 faa 的空/非空须一致, 故不虚构注释行。
     touch ${mag_id}.emapper.annotations ${mag_id}.emapper.seed_orthologs
 
     cat <<-END_VERSIONS > versions.yml

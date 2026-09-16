@@ -18,7 +18,7 @@
 // 调度语义: 每个 plot process 以其输入通道是否为空独立调度 —— 对应 Phase 被
 // skip 时 (通道空) 该图自然不调度、figures/ 不建。漏斗以 bin_summary 为锚
 // (非空才调度), 其余 3 张可选表以 assets/empty.tsv 哨兵兜底 (ifEmpty 只接受
-// 具体值, 见 STATUS 已知问题), 脚本按"0 字节 = 层级缺失"跳过该级画剩余漏斗。
+// 具体值, 详见文档), 脚本按"0 字节 = 层级缺失"跳过该级画剩余漏斗。
 // ============================================================================
 
 include { PLOT_ABUNDANCE_HEATMAP    } from '../../modules/local/plotting/abundance_heatmap.nf'
@@ -48,7 +48,7 @@ workflow PLOTTING {
     ch_sentinel = file("${projectDir}/assets/empty.tsv", checkIfExists: true)
 
     // ---------------------------------------------------------------------
-    // ① MAG 丰度热图 (13_abundance/figures/) —— 本机真实可验证
+    // ① MAG 丰度热图 (13_abundance/figures/) —— 可用真实数据验证
     // ---------------------------------------------------------------------
     PLOT_ABUNDANCE_HEATMAP(ch_abundance, ch_script)
     ch_versions = ch_versions.mix(PLOT_ABUNDANCE_HEATMAP.out.versions)

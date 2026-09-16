@@ -16,7 +16,7 @@
 //        catalog         = path(dereplicated_genomes/)       代表 MAG FASTA 目录
 //        clusters        = path(data_tables/)                dRep 原始聚类数据表
 //
-// 聚合规则 (ArrayBag 规避, 见 STATUS.md「已知问题」):
+// 聚合规则 (ArrayBag 规避, 详见文档):
 //   - manifest/genomeInfo 类元数据: map{...}.collectFile(name:..., sort: true)
 //     物化为文件;
 //   - 文件列表: map{...}.toSortedList() 传 path 输入。

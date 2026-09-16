@@ -6,8 +6,8 @@
 //        ch_pathabundance     = tuple(meta, path)         (HUMAnN 通路丰度表)
 // 处理:  只消费, 不重做任何上游计算。集合级批处理 ——
 //        1. manifest collectFile 物化 (sort: true, 内容与 -resume 哈希稳定),
-//           文件列表经 toSortedList 传 path 输入 (ArrayBag 规避, 见 STATUS
-//           已知问题; 脚本经 manifest 的 resolve() 双路径打开, Phase 12/14 模式);
+//           文件列表经 toSortedList 传 path 输入 (规避 ArrayBag 扁平化),
+//           脚本经 manifest 的 resolve() 双路径打开 (Phase 12/14 模式);
 //        2. MERGE_BRACKEN 产出各层级 merged_<level>.tsv + beta_diversity.tsv;
 //           MERGE_PATHABUNDANCE 产出 merged_pathabundance.tsv。
 // 输出:  bracken_merged / beta_diversity / pathabundance_merged / versions

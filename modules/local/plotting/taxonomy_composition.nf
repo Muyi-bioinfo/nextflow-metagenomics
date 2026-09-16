@@ -5,7 +5,7 @@
 // 10_mag_taxonomy/figures/mag_taxonomy_composition.png (top-N 门/纲 MAG 计数)。
 //
 // 只消费现成表。空表/全空分类告警跳过。database-dependent: 真实 GTDB-Tk
-// 数据本机无库, 代码由 stub/合成表验证"能画"。
+// 数据本地无库, 代码由 stub/合成表验证"能画"。
 // ============================================================================
 
 process PLOT_TAXONOMY_COMPOSITION {

@@ -49,7 +49,7 @@ process DIAMOND_BLASTP {
     """
     # 占位输出仅验证通道形状与文件命名约定, 内容不代表真实比对结果。
     # 空命中表: PRODIGAL stub 的 faa 为空, DIAMOND_SUMMARY 走真实解析脚本,
-    # raw 与 faa 的空/非空须一致 (否则未知 gene id 报错), 故不伪造命中行。
+    # raw 与 faa 的空/非空须一致 (否则未知 gene id 报错), 故不虚构命中行。
     touch ${mag_id}.diamond.tsv
 
     cat <<-END_VERSIONS > versions.yml

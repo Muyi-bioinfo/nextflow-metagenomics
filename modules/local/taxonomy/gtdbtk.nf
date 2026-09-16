@@ -18,7 +18,7 @@
 // MAG 身份在聚合之后不丢失。
 //
 // 注意: 不用 val 通道传 tuple 列表 —— Nextflow 的 collect 聚合会把 tuple
-// 扁平化为 ArrayBag, process 内无法按三元组还原 (实测踩坑, 见 STATUS.md)。
+// 扁平化为 ArrayBag, process 内无法按三元组还原 (实测发现)。
 // ============================================================================
 
 process GTDBTK {

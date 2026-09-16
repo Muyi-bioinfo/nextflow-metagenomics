@@ -7,7 +7,7 @@
 //
 // 只消费现成表。距离矩阵缺失 / <2 样本 / 正特征值 <2 时脚本告警跳过。
 // beta_diversity 本身是 optional emit (单样本/0 taxa 不发射) → 通道空则本
-// process 不调度。database-dependent: 真实 Bracken 数据本机无库。
+// process 不调度。database-dependent: 真实 Bracken 数据本地无库。
 // ============================================================================
 
 process PLOT_BETA_PCOA {

@@ -356,9 +356,9 @@ workflow mag {
     // 组装汇总 join 成两张核心表 (mag_metadata.tsv / mag_functional_annotation.tsv)
     // + 引用拷贝 (成员表/组装汇总)。每个输入表都可能因对应 --skip_* 为空
     // 通道 —— INTEGRATION 子工作流内以 0 字节哨兵兜底 (ifEmpty 只接受具体
-    // 值, 见 STATUS 已知问题), 缺失表的对应列留空, 行集合由存在表的并集
+    // 值, 详见文档), 缺失表的对应列留空, 行集合由存在表的并集
     // 决定。pathway_db 为可选外部依赖 (KO→pathway 映射), 未提供时 Pathway
-    // 列留空 (不伪造)。上游组合导致代表 MAG 通道为空时 (如 --skip_binning),
+    // 列留空 (不虚构)。上游组合导致代表 MAG 通道为空时 (如 --skip_binning),
     // 子工作流内聚合不发射, 本阶段不调度任务 (正常收尾)。
     // ---------------------------------------------------------------------
     if (!params.skip_integration) {
@@ -381,7 +381,7 @@ workflow mag {
     //
     // 每个 plot process 以其输入通道是否为空独立调度: 对应 Phase 被 skip 时
     // 该图不调度、figures/ 不建。database-dependent 图 (除 MAG 丰度热图外)
-    // 真实数据本机无库, 代码由 stub/合成表验证"能画", 真实图待库 (规则 3)。
+    // 真实数据本地无库, 代码由 stub/合成表验证"能画", 真实图待库 。
     // ---------------------------------------------------------------------
     PLOTTING(
         ch_bin_summary, ch_qc_table, ch_taxonomy_table, ch_membership,

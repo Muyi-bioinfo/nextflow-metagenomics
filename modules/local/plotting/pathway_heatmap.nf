@@ -6,7 +6,7 @@
 // 04_function/figures/pathway_abundance_heatmap.png (log10 色阶)。
 //
 // 只消费现成表。空表/无 pathway 告警跳过。database-dependent: 真实 HUMAnN
-// 数据本机无库, 代码由 stub/合成表验证"能画"。
+// 数据本地无库, 代码由 stub/合成表验证"能画"。
 // ============================================================================
 
 process PLOT_PATHWAY_HEATMAP {
